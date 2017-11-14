@@ -1,0 +1,31 @@
+seed: 123
+===============
+ordered_train
+number of sentences: 500000
+number of tokens: 6576692
+
+===============
+ordered_dev
+number of sentences: 150000
+number of tokens: 2015892
+
+===============
+ordered_test
+number of sentences: 98066
+number of tokens: 1325857
+
+===============
+shuffled_train
+number of sentences: 500000
+number of tokens: 6629922
+
+===============
+shuffled_dev
+number of sentences: 150000
+number of tokens: 1990102
+
+===============
+shuffled_test
+number of sentences: 98066
+number of tokens: 1298417
+
