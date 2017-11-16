@@ -1,0 +1,2 @@
+Benchmark: predict the after token as the before token
+dev accuracy: 0.933371254338
