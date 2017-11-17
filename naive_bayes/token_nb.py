@@ -56,7 +56,7 @@ train_predict0 = time.clock()
 predict_token_nb(token_nb_model, train_dev_data)
 train_accuracy = sum(train_dev_data['after'] == train_dev_data['predicted']) / train_dev_data.shape[0]
 with open('naive_bayes/train_prediction.p', 'wb') as predict_file:
-    pickle.dump(dev_data, predict_file)
+    pickle.dump(train_dev_data, predict_file)
 train_predict1 = time.clock()
 
 # Train on the whole training set
