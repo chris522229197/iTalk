@@ -1,0 +1,21 @@
+seed: 123
+===============
+train
+number of sentences: 500000
+number of tokens: 6629922
+
+===============
+train_dev
+number of sentences: 75000
+number of tokens: 993597
+
+===============
+dev
+number of sentences: 75000
+number of tokens: 996505
+
+===============
+test
+number of sentences: 98066
+number of tokens: 1298417
+
