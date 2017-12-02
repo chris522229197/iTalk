@@ -1,6 +1,7 @@
 # Data
 *.csv
 /processed_data/*.p
+*.zip
 
 # OS
 *.DS_Store
