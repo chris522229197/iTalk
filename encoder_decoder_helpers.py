@@ -5,6 +5,7 @@
 import numpy as np
 from keras.models import Model
 from keras.layers import Input, LSTM, Dense
+from keras.models import model_from_json
 
 # Convert lists of input tokens and target tokens to one-hot format of encoder input, 
 # decoder input, and decoder target
@@ -103,3 +104,21 @@ def batch_decode(encoder_input, target_idx_lookup, target_char_lookup, decoder, 
                                                decoder, encoder, max_length)
         prediction.append(str_token)
     return prediction
+
+# Save a dictionary of Keras models
+def save_models(models_dict, directory):
+    for name, model in models_dict.items():
+        with open(directory + '/' + name + '.json', 'w') as file:
+            file.write(model.to_json())
+        model.save_weights(directory + '/' + name + '.h5')
+
+# Load a list of Keras models
+def load_models(model_names, directory):
+    models = {}
+    for model_name in model_names:
+        with open(directory + '/' + model_name + '.json', 'r') as file:
+            json_str = file.read()
+        model = model_from_json(json_str)
+        model.load_weights(directory + '/' + model_name + '.h5')
+        models[model_name] = model
+    return models
