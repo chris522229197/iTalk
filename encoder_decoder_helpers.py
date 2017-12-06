@@ -19,11 +19,14 @@ def convert_onehot(input_list, target_list, input_lookup, target_lookup,
                               dtype='float32')
     for r, (input_token, target_token) in enumerate(zip(input_list, target_list)):
         for t, char in enumerate(input_token):
-            encoder_input[r, t, input_lookup[char]] = 1.
+            if char in input_lookup:
+                encoder_input[r, t, input_lookup[char]] = 1.
         for t, char in enumerate(target_token):
-            decoder_input[r, t, target_lookup[char]] = 1.
+            if char in target_lookup:
+                decoder_input[r, t, target_lookup[char]] = 1.
             if t > 0:
-                decoder_target[r, t - 1, target_lookup[char]] = 1.
+                if char in target_lookup:
+                    decoder_target[r, t - 1, target_lookup[char]] = 1.
     return encoder_input, decoder_input, decoder_target
 
 # Construct encoder-decoder model and the inference models (encoder and decoder)
