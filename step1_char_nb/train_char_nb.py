@@ -3,7 +3,6 @@
 import pickle
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from sklearn import preprocessing
 from sklearn.naive_bayes import MultinomialNB
 import time
