@@ -1,0 +1,2 @@
+SVM model
+testing accuracy: 0.988800978422
