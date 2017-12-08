@@ -7,8 +7,14 @@ from sklearn import preprocessing
 from sklearn.naive_bayes import MultinomialNB
 import time
 
+# Log the process
+def process_log(train_time, train_accuracy, dev_accuracy):
+    with open('step1_char_nb/process_log.txt', 'w') as log_file:
+        log_file.write('train time: ' + str(int(train_time)) + '\n')
+        log_file.write('train accuracy (token class): ' + str(train_accuracy) + '\n')
+        log_file.write('dev accuracy (token class): ' + str(dev_accuracy) + '\n')
+
 # Load data
-all_data = pd.read_csv('data/en_train.csv')
 train_data = pd.read_csv('data/train.csv')
 train_dev_data = pd.read_csv('data/train_dev.csv')
 
@@ -20,7 +26,7 @@ with open('processed_data/data_tf.p', 'rb') as f:
     test_tf = pickle.load(f)
     
 # Find the token classes
-classes = all_data['class'].unique()
+classes = train_data['class'].unique()
 encoded_classes = preprocessing.LabelEncoder()
 encoded_classes.fit(classes)
 
@@ -28,20 +34,22 @@ encoded_classes.fit(classes)
 train_class = encoded_classes.transform(train_data['class'])
 train_dev_class = encoded_classes.transform(train_dev_data['class'])
 
-# Prepare toy data sets
-X = train_tf
-y = train_class
+# Train the multinomial Naive Bayes with Laplace smoothing
+train0 = time.clock()
+char_nb_model = MultinomialNB()
+char_nb_model.fit(train_tf, train_class)
+with open('step1_char_nb/step1_nb_model.p', 'wb') as f:
+    pickle.dump(char_nb_model, f)
+train1 = time.clock()
 
-test = train_dev_tf
-test_class = train_dev_class
+# Compute the training accuracy
+train_pred = char_nb_model.predict(train_tf)
+train_accuracy = np.sum(train_pred == train_class) / len(train_class)
 
-# Multinomial Naive Bayes
-t0 = time.clock()
-char_nb = MultinomialNB()
-char_nb.fit(X, y)
-char_nb.predict(test)
-t1 = time.clock()
+# Compute the development accuracy
+dev_pred = char_nb_model.predict(train_dev_tf)
+dev_accuracy = np.sum(dev_pred == train_dev_class) / len(train_dev_class)
 
-pred = char_nb.predict(test)
-accuracy = np.sum(pred == test_class) / len(test_class)
+# Log the process
+process_log(train1 - train0, train_accuracy, dev_accuracy)
 
