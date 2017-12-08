@@ -32,3 +32,6 @@ def pipeline_predict(token_nb, step1_model, step2_trans, tokens, tokens_tfidf, c
                                 'predicted_class': pred_classes, 
                                 'predicted_after': pred_tokens})
     return predictions
+
+def find_accuracy(df, true_col='after', pred_col='predicted_after'):
+    return np.sum(df[true_col] == df[pred_col]) / len(df)

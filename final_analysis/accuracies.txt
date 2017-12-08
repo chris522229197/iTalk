@@ -1,0 +1,8 @@
+==================================================
+SVM model
+training accuracy: 0.998065738933
+development accuracy: 0.993629207818
+==================================================
+Multinomial Naive Bayes model
+training accuracy: 0.998065738933
+development accuracy: 0.993204488339
