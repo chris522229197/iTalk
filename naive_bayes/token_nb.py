@@ -4,7 +4,6 @@ import pickle
 
 train_data = pd.read_csv('data/train.csv', index_col = 0)
 train_dev_data = pd.read_csv('data/train_dev.csv', index_col = 0)
-dev_data = pd.read_csv('data/dev.csv', index_col = 0)
 
 # For a given before token, find the frequencies of its corresponding after tokens
 def count_token(before, after, freq_map):
@@ -35,12 +34,11 @@ def predict_token_nb(freq_map, dev):
 
 # Log the process
 def log_token_nb(train_time, train_predict_time, train_accuracy, 
-                 dev_time, dev_predict_time, dev_accuracy):
+                 dev_predict_time, dev_accuracy):
     with open('naive_bayes/token_nb_log.txt', 'w') as log_file:
         log_file.write('train time: ' + str(int(train_time)) + '\n')
         log_file.write('train prediction time: ' + str(int(train_predict_time)) + '\n')
         log_file.write('train accuracy: ' + str(train_accuracy) + '\n')
-        log_file.write('dev train time: ' + str(int(dev_time)) + '\n')
         log_file.write('dev prediction time: ' + str(int(dev_predict_time)) + '\n')
         log_file.write('dev accuracy: ' + str(dev_accuracy) + '\n')
     
@@ -48,36 +46,27 @@ def log_token_nb(train_time, train_predict_time, train_accuracy,
 print('Training on the train data ...')
 train0 = time.clock()
 token_nb_model = train_token_nb(train_data)
+with open('naive_bayes/token_nb_model.p', 'wb') as f:
+    pickle.dump(token_nb_model, f)
 train1 = time.clock()
 
-# Predict on train dev set and find training accuracy
-print('Predicting the train dev set ...')
+# Compute the training accuracy
+print('Finding training accuracy ...')
 train_predict0 = time.clock()
-predict_token_nb(token_nb_model, train_dev_data)
-train_accuracy = sum(train_dev_data['after'] == train_dev_data['predicted']) / train_dev_data.shape[0]
-with open('naive_bayes/train_prediction.p', 'wb') as predict_file:
-    pickle.dump(train_dev_data, predict_file)
+predict_token_nb(token_nb_model, train_data)
+train_accuracy = sum(train_data['after'] == train_data['predicted']) / train_data.shape[0]
 train_predict1 = time.clock()
 
-# Train on the whole training set
-print('Training on the train and train dev data ...')
-dev_train0 = time.clock()
-dev_token_nb_model = train_token_nb(train_data.append(train_dev_data))
-with open('naive_bayes/dev_token_nb_model.p', 'wb') as model_file:
-    pickle.dump(dev_token_nb_model, model_file)
-dev_train1 = time.clock()
-
-# Predict on the dev set
-print('Predicting the dev set ...')
+# Compute the development accuracy and output result
+print('Finding development accuracy ...')
 dev_predict0 = time.clock()
-predict_token_nb(dev_token_nb_model, dev_data)
+predict_token_nb(token_nb_model, train_dev_data)
+dev_accuracy = sum(train_dev_data['after'] == train_dev_data['predicted']) / train_dev_data.shape[0]
+with open('naive_bayes/dev_prediction.p', 'wb') as f:
+    pickle.dump(train_dev_data, f)
 dev_predict1 = time.clock()
-
-# Find dev accuracy
-dev_accuracy = sum(dev_data['after'] == dev_data['predicted']) / dev_data.shape[0]
 
 # Log the process
 log_token_nb(train1 - train0, train_predict1 - train_predict0, train_accuracy, 
-             dev_train1 - dev_train0, dev_predict1 - dev_predict0, 
-             dev_accuracy)
+             dev_predict1 - dev_predict0, dev_accuracy)
 print('Done!')

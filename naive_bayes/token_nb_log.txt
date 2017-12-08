@@ -1,6 +1,5 @@
 train time: 240
-train prediction time: 26
-train accuracy: 0.98973628141
-dev train time: 279
-dev prediction time: 24
-dev accuracy: 0.990260962062
+train prediction time: 189
+train accuracy: 0.998065738933
+dev prediction time: 30
+dev accuracy: 0.98973628141
