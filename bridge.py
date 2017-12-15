@@ -39,6 +39,7 @@ train_after = train['after'].tolist()
 
 train_dev_before = train_dev['before'].tolist()
 train_dev_after = train_dev['after'].tolist()
+train_dev_class = train_dev['class'].tolist()
 
 # Combine the token-level Naive Bayes, step 1 classification model, and step 2 translation
 def pipeline_predict(token_nb, step1_model, step2_trans, tokens, tokens_tfidf, class_encoder):
