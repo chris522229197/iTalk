@@ -1,0 +1,3 @@
+train time: 5
+train accuracy (token class): 0.969841123319
+dev accuracy (token class): 0.96969294392
