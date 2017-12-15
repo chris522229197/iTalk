@@ -37,7 +37,7 @@ from sklearn.metrics import confusion_matrix
 # true train_dev class
 train_dev_pd= pd.read_csv('data/train_dev.csv')
 class_names = train_dev_pd['class'].unique()
-y_test = train_dev_pd['class']
+y_true = train_dev_pd['class']
 
 # predict train_dev class with SVM 
 with open('processed_data/data_tfidf.p', 'rb') as f:
@@ -50,10 +50,10 @@ class_encoder = pickle.load(open('classEncoder.p', 'rb'))
 classes = class_encoder.inverse_transform(range(16))
 y_pred = class_encoder.inverse_transform(prediction)
 
-def plot_confusion_matrix(y_test, y_pred, classes,
+def plot_confusion_matrix(y_true, y_pred, classes,
                           cmap=plt.cm.Reds):
     # Compute confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
+    cm = confusion_matrix(y_true, y_pred)
     cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     cm = np.round(cm, 2)
     cm[cm < 0.01] = 0
@@ -80,6 +80,54 @@ def plot_confusion_matrix(y_test, y_pred, classes,
 # Plot normalized confusion matrix
 plt.figure()
 plt.figure(figsize=(100, 100))
-plot_confusion_matrix(y_test, y_pred, classes)
+plot_confusion_matrix(y_true, y_pred, classes)
 plt.show()
 plt.savefig('Confusion Matrix',bbox_inches='tight')
+
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+# unbalanced
+# evaluation for each class
+
+cm = confusion_matrix(y_true, y_pred)
+cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+unb_accuracys = np.round(np.diag(cm), 2)
+
+unb_precisions = np.round(precision_score(y_true, y_pred, average= None), 2)
+unb_recalls = np.round(recall_score(y_true, y_pred, average= None), 2)
+df_un = pd.DataFrame({'Class': classes,'Accuracy':unb_accuracys,
+                      'Precision':unb_precisions,
+                      'Recall':unb_recalls})
+df_un = df_un[['Class','Accuracy', 'Precision', 'Recall']]
+writer = pd.ExcelWriter('SVM_Metrics_Class.xlsx', engine='xlsxwriter')
+df_un.to_excel(writer, sheet_name='Sheet1')
+worksheet = writer.sheets['Sheet1']
+worksheet.conditional_format('C2:B17', {'type': '3_color_scale'})
+writer.save()
+
+
+
+# average values
+unbalanced_accuracy = 98.54
+unbalanced_precision =  np.round(precision_score(y_true, y_pred, average= 'weighted')*100,2)
+unbalanced_recall =  np.round(recall_score(y_true, y_pred, average= 'weighted')*100,2)
+
+# balanced svm
+svm_model_ba = pickle.load(open('svm_balanced_2.p', 'rb'))
+prediction_ba = svm_model_ba.predict(train_dev)
+y_pred_ba = class_encoder.inverse_transform(prediction_ba)
+balanced_accuracy = 98.01
+balanced_precision =  np.round(precision_score(y_true, y_pred_ba, average= 'weighted')*100,2)
+balanced_recall =  np.round(recall_score(y_true, y_pred_ba, average= 'weighted')*100,2)
+
+df = pd.DataFrame({'Parameter': ['unbalanced','balanced'],
+                   'Accuracy':[unbalanced_accuracy,balanced_accuracy],
+                   'Precision':[unbalanced_precision,balanced_precision],
+                   'Recall':[unbalanced_recall,balanced_recall]})
+df = df[['Parameter','Accuracy', 'Precision', 'Recall']]
+writer = pd.ExcelWriter('SVM_Compare.xlsx', engine='xlsxwriter')
+df.to_excel(writer, sheet_name='Sheet1')
+#worksheet = writer.sheets['Sheet1']
+#worksheet.conditional_format('C2', {'type': '3_color_scale'})
+writer.save()
